@@ -5,13 +5,16 @@ This repository is a
 ## 
 
 
-## To run test
+## To run unittest.
 ```
 python unittest.py
 ```
 
+## Acknowledgement
+- Using GUINNESS
+-
 
 ## License
 ```
-MIT but codes from unittest.py
+MIT but not include codes from /test folder. 
 ```

@@ -1,20 +1,25 @@
 # Unofficial Pytorch implementation of batch normalization free technique for binarized neural network.
-This repository is a 
+This repository 
 
 
-## 
+## Example:
+```python
+```
+
 
 
 ## To run unittest.
-```
+```bash
 python unittest.py
 ```
 
 ## Acknowledgement
-- Using GUINNESS
--
+We applied some third party codes as follows:
+- [GUINNESS](): 
+- [Binary-Net](): 
+
 
 ## License
 ```
-MIT but not include codes from /test folder. 
+MIT except codes in third parties folder.
 ```

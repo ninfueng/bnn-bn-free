@@ -1,5 +1,6 @@
-# Unofficial Pytorch implementation of batch normalization free technique for binarized neural network.
-This repository 
+# Unofficial Pytorch implementation of Batch normalization free technique for binarized neural network.
+The 
+
 
 
 ## Example:

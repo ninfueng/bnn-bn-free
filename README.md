@@ -16,11 +16,11 @@ python unittest.py
 
 ## Acknowledgement
 We applied some third party codes as follows:
-- [GUINNESS](): 
-- [Binary-Net](): 
+- [GUINNESS](https://github.com/HirokiNakahara/GUINNESS): GPL-2.0 License
+- [BinaryNet.pytorch](https://github.com/itayhubara/BinaryNet.pytorch): Unknown
 
 
 ## License
 ```
-MIT except codes in third parties folder.
+MIT except codes in thrid parties folder.
 ```

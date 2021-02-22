@@ -8,8 +8,7 @@ Replace `BatchNorm1d` or `BatchNorm2d` with `YonekawaBatchNorm1d`, `YonekawaBatc
 
 ## With BN and BN-free
 
-Comparing between BN and BN-free in MNIST dataset with binarized multilayer perceptron with 2 hidden layers.
-The performance of BN-free is almost identical to BN. However, there are still some noises in the rounding process.
+Comparing between BN and BN-free in MNIST dataset with binarized multilayer perceptron with 2 hidden layers. The performance of BN-free is almost identical to BN. However, there are still some noises in the rounding process.
 ![result](test_acc.png)
 
 ![relation](relation.png)

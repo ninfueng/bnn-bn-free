@@ -22,7 +22,7 @@ python test_mnist.py
 
 We used third party codes as follows:
 
-- [BinaryNet.pytorch](https://github.com/itayhubara/BinaryNet.pytorch): Unknown License, we put these codes to `binarized_modules.py` and `test_mnist.py`.
+- [BinaryNet.pytorch](https://github.com/itayhubara/BinaryNet.pytorch): Unknown License, I put these codes to `binarized_modules.py` and `test_mnist.py`.
 
 ## Citing
 

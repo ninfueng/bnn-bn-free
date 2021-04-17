@@ -19,6 +19,7 @@ class YonekawaBatchNorm1d(nn.BatchNorm1d):
     Modified from:
         https://github.com/HirokiNakahara/GUINNESS/blob/master/conv_npz2txt_v2.py
     """
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
 
@@ -28,14 +29,17 @@ class YonekawaBatchNorm1d(nn.BatchNorm1d):
         """
         if self.training:
             raise Exception(
-                'This Model is in training model, this method supports only eval mode.')
+                "This Model is in training model, this method supports only eval mode."
+            )
         beta, gamma, eps = self.bias, self.weight, self.eps
         mean, var = self.running_mean, self.running_var
 
         if bias is None:
-            integer_bias = torch.round(-mean + (beta*(torch.sqrt(var + eps))/gamma))
+            integer_bias = torch.round(-mean + (beta * (torch.sqrt(var + eps)) / gamma))
         else:
-            integer_bias = torch.round(bias - mean + (beta*(torch.sqrt(var + eps))/gamma))
+            integer_bias = torch.round(
+                bias - mean + (beta * (torch.sqrt(var + eps)) / gamma)
+            )
         return integer_bias
 
     def forward_with_int_bias(self, x: torch.Tensor) -> torch.Tensor:
@@ -55,13 +59,16 @@ class YonekawaBatchNorm2d(nn.BatchNorm2d):
         """
         if self.training:
             raise Exception(
-                'This Model is in training model, this method supports only eval mode.')
+                "This Model is in training model, this method supports only eval mode."
+            )
         beta, gamma, eps = self.bias, self.weight, self.eps
         mean, var = self.running_mean, self.running_var
         if bias is None:
-            int_bias = torch.round(-mean + (beta*(torch.sqrt(var + eps))/gamma))
+            int_bias = torch.round(-mean + (beta * (torch.sqrt(var + eps)) / gamma))
         else:
-            int_bias = torch.round(bias - mean + (beta*(torch.sqrt(var + eps))/gamma))
+            int_bias = torch.round(
+                bias - mean + (beta * (torch.sqrt(var + eps)) / gamma)
+            )
         return int_bias
 
     def forward_with_int_bias(self, x: torch.Tensor) -> torch.Tensor:

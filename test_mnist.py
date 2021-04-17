@@ -4,36 +4,67 @@ License: Unknown
 import argparse
 from multiprocessing import cpu_count
 
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torchvision import datasets, transforms
 from torch.autograd import Variable
-import matplotlib.pyplot as plt
+from torchvision import datasets, transforms
 
 from binarized_modules import BinarizeLinear
 from bnn_bn import YonekawaBatchNorm1d
 
-parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
-parser.add_argument('--batch-size', type=int, default=256, metavar='N',
-                    help='input batch size for training (default: 256)')
-parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
-                    help='input batch size for testing (default: 1000)')
-parser.add_argument('--epochs', type=int, default=100, metavar='N',
-                    help='number of epochs to train (default: 10)')
-parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
-                    help='learning rate (default: 0.001)')
-parser.add_argument('--momentum', type=float, default=0.5, metavar='M',
-                    help='SGD momentum (default: 0.5)')
-parser.add_argument('--no-cuda', action='store_true', default=False,
-                    help='disables CUDA training')
-parser.add_argument('--seed', type=int, default=1, metavar='S',
-                    help='random seed (default: 1)')
-parser.add_argument('--gpus', default=3,
-                    help='gpus used for training - e.g 0,1,3')
-parser.add_argument('--log-interval', type=int, default=10, metavar='N',
-                    help='how many batches to wait before logging training status')
+parser = argparse.ArgumentParser(description="PyTorch MNIST Example")
+parser.add_argument(
+    "--batch-size",
+    type=int,
+    default=256,
+    metavar="N",
+    help="input batch size for training (default: 256)",
+)
+parser.add_argument(
+    "--test-batch-size",
+    type=int,
+    default=1000,
+    metavar="N",
+    help="input batch size for testing (default: 1000)",
+)
+parser.add_argument(
+    "--epochs",
+    type=int,
+    default=100,
+    metavar="N",
+    help="number of epochs to train (default: 10)",
+)
+parser.add_argument(
+    "--lr",
+    type=float,
+    default=0.01,
+    metavar="LR",
+    help="learning rate (default: 0.001)",
+)
+parser.add_argument(
+    "--momentum",
+    type=float,
+    default=0.5,
+    metavar="M",
+    help="SGD momentum (default: 0.5)",
+)
+parser.add_argument(
+    "--no-cuda", action="store_true", default=False, help="disables CUDA training"
+)
+parser.add_argument(
+    "--seed", type=int, default=1, metavar="S", help="random seed (default: 1)"
+)
+parser.add_argument("--gpus", default=3, help="gpus used for training - e.g 0,1,3")
+parser.add_argument(
+    "--log-interval",
+    type=int,
+    default=10,
+    metavar="N",
+    help="how many batches to wait before logging training status",
+)
 args = parser.parse_args()
 
 
@@ -55,7 +86,7 @@ class Net(nn.Module):
         self.fc4 = nn.Linear(1024, 10, bias=True)
 
     def forward(self, x):
-        x = x.view(-1, 28*28)
+        x = x.view(-1, 28 * 28)
         x = self.fc1(x)
         x = self.bn1(x)
         x = self.htanh1(x)
@@ -72,7 +103,7 @@ class Net(nn.Module):
         return x
 
     def test_forward(self, x):
-        x = x.view(-1, 28*28)
+        x = x.view(-1, 28 * 28)
         x = self.fc1(x)
         x = x + self.bn1.get_int_bias()
         x = self.htanh1(x)
@@ -101,18 +132,19 @@ def train(epoch):
         output = model(data)
         loss = criterion(output, target)
 
-        if epoch%40 == 0:
-            optimizer.param_groups[0]['lr'] = optimizer.param_groups[0]['lr']*0.1
+        if epoch % 40 == 0:
+            optimizer.param_groups[0]["lr"] = optimizer.param_groups[0]["lr"] * 0.1
 
         optimizer.zero_grad()
         loss.backward()
         for p in list(model.parameters()):
-            if hasattr(p,'org'):
+            if hasattr(p, "org"):
                 p.data.copy_(p.org)
         optimizer.step()
         for p in list(model.parameters()):
-            if hasattr(p,'org'):
-                p.org.copy_(p.data.clamp_(-1,1))
+            if hasattr(p, "org"):
+                p.org.copy_(p.data.clamp_(-1, 1))
+
 
 def test(dictlist):
     model.eval()
@@ -124,15 +156,22 @@ def test(dictlist):
                 data, target = data.cuda(), target.cuda()
             data, target = Variable(data), Variable(target)
             output = model(data)
-            test_loss += criterion(output, target).item() # sum up batch loss
-            pred = output.data.max(1, keepdim=True)[1] # get the index of the max log-probability
+            test_loss += criterion(output, target).item()  # sum up batch loss
+            pred = output.data.max(1, keepdim=True)[
+                1
+            ]  # get the index of the max log-probability
             correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 
     test_loss /= len(test_loader.dataset)
-    dictlist['test_acc'].append(correct/len(test_loader.dataset))
-    print('Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)'.format(
-        test_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
+    dictlist["test_acc"].append(correct / len(test_loader.dataset))
+    print(
+        "Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)".format(
+            test_loss,
+            correct,
+            len(test_loader.dataset),
+            100.0 * correct / len(test_loader.dataset),
+        )
+    )
 
 
 def test_bn(dictlist):
@@ -145,39 +184,57 @@ def test_bn(dictlist):
                 data, target = data.cuda(), target.cuda()
             data, target = Variable(data), Variable(target)
             output = model.test_forward(data)
-            test_loss += criterion(output, target).item() # sum up batch loss
-            pred = output.data.max(1, keepdim=True)[1] # get the index of the max log-probability
+            test_loss += criterion(output, target).item()  # sum up batch loss
+            pred = output.data.max(1, keepdim=True)[
+                1
+            ]  # get the index of the max log-probability
             correct += pred.eq(target.data.view_as(pred)).cpu().sum()
 
     test_loss /= len(test_loader.dataset)
-    dictlist['bn_free_test_acc'].append(correct/len(test_loader.dataset))
-    print('BN Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)'.format(
-        test_loss, correct, len(test_loader.dataset),
-        100. * correct / len(test_loader.dataset)))
+    dictlist["bn_free_test_acc"].append(correct / len(test_loader.dataset))
+    print(
+        "BN Test set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)".format(
+            test_loss,
+            correct,
+            len(test_loader.dataset),
+            100.0 * correct / len(test_loader.dataset),
+        )
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args.cuda = not args.no_cuda and torch.cuda.is_available()
     torch.manual_seed(args.seed)
     if args.cuda:
         torch.cuda.manual_seed(args.seed)
-    kwargs = {'num_workers': cpu_count(), 'pin_memory': True} if args.cuda else {}
+    kwargs = {"num_workers": cpu_count(), "pin_memory": True} if args.cuda else {}
 
     train_loader = torch.utils.data.DataLoader(
-        datasets.MNIST('../data', train=True, download=True,
-                       transform=transforms.Compose([
-                           transforms.ToTensor(),
-                           transforms.Normalize((0.5,), (0.5,))
-                       ])),
-        batch_size=args.batch_size, shuffle=True, **kwargs)
+        datasets.MNIST(
+            "../data",
+            train=True,
+            download=True,
+            transform=transforms.Compose(
+                [transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))]
+            ),
+        ),
+        batch_size=args.batch_size,
+        shuffle=True,
+        **kwargs
+    )
 
     test_loader = torch.utils.data.DataLoader(
         datasets.MNIST(
-            '../data', train=False, transform=transforms.Compose([
-                        transforms.ToTensor(),
-                           transforms.Normalize((0.5,), (0.5,))
-                       ])),
-        batch_size=args.test_batch_size, shuffle=True, **kwargs)
+            "../data",
+            train=False,
+            transform=transforms.Compose(
+                [transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))]
+            ),
+        ),
+        batch_size=args.test_batch_size,
+        shuffle=True,
+        **kwargs
+    )
 
     model = Net()
     if args.cuda:
@@ -186,20 +243,20 @@ if __name__ == '__main__':
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
 
-    dictlist = {'test_acc': [], 'bn_free_test_acc': []}
+    dictlist = {"test_acc": [], "bn_free_test_acc": []}
     for epoch in range(1, args.epochs + 1):
         train(epoch)
         test(dictlist)
         test_bn(dictlist)
 
-    plt.plot(dictlist['test_acc'], label='Normal BN')
-    plt.plot(dictlist['bn_free_test_acc'], label='BN free')
-    plt.xlabel('Epoch')
-    plt.ylabel('Test Acc')
+    plt.plot(dictlist["test_acc"], label="Normal BN")
+    plt.plot(dictlist["bn_free_test_acc"], label="BN free")
+    plt.xlabel("Epoch")
+    plt.ylabel("Test Acc")
     plt.legend(loc="lower right")
     plt.show()
 
-    plt.plot(dictlist['test_acc'], dictlist['bn_free_test_acc'])
-    plt.xlabel('Test Acc')
-    plt.ylabel('Test Acc BN free')
+    plt.plot(dictlist["test_acc"], dictlist["bn_free_test_acc"])
+    plt.xlabel("Test Acc")
+    plt.ylabel("Test Acc BN free")
     plt.show()

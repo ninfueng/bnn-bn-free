@@ -10,7 +10,7 @@ import torch.nn as nn
 
 
 class YonekawaBatchNorm1d(nn.BatchNorm1d):
-    r"""Recreated interger batch normalization for binarized neural network.
+    """Recreated interger batch normalization for binarized neural network.
     GUINNESS implements this with int20 or int16 datatype.
     Note that by using `forward` method will act as a common batch normalization.
     However, by using `forward_with_int_bias` method will act as Yonekawa et al. or
@@ -54,7 +54,7 @@ class YonekawaBatchNorm2d(nn.BatchNorm2d):
         super().__init__(*args, **kwargs)
 
     def get_int_bias(self, bias: torch.Tensor = None) -> torch.Tensor:
-        r"""Get integer bias which can be used to replace BatchNorm process by using
+        """Get integer bias which can be used to replace BatchNorm process by using
         this integer to add with.
         """
         if self.training:
@@ -72,7 +72,7 @@ class YonekawaBatchNorm2d(nn.BatchNorm2d):
         return int_bias
 
     def forward_with_int_bias(self, x: torch.Tensor) -> torch.Tensor:
-        r""" Adding integer bias to the tensor.
+        """ Adding integer bias to the tensor.
         Designed to add after binary layer and before Hardtanh and binary layer.
         """
         return x + self.get_int_bias()
